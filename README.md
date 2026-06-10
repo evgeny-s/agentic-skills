@@ -1,9 +1,8 @@
 # agentic-skills
 
-A collection of [Claude](https://claude.com/claude-code) **skills** — reusable, self-contained
-capabilities that teach an agent a methodology. Each skill is a directory with a `SKILL.md`
-(frontmatter + when-to-use + the playbook) and optional `references/` files loaded on demand
-(progressive disclosure).
+A collection of agent **skills** — reusable, self-contained capabilities that teach an agent a
+methodology. Each skill is a directory with a `SKILL.md` (frontmatter + when-to-use + the playbook)
+and optional `references/` files loaded on demand (progressive disclosure).
 
 ## Skills
 
@@ -34,5 +33,5 @@ a structured `feature-model.md` spec, confirms with the user, then scaffolds the
 
 ## Using a skill
 
-Point Claude Code at this repo (or copy a skill directory into your skills location) and invoke it
-by name. Claude reads `SKILL.md` first and pulls the `references/` files as the task needs them.
+Point your agent at this repo (or copy a skill directory into your skills location) and invoke it
+by name. The agent reads `SKILL.md` first and pulls the `references/` files as the task needs them.
