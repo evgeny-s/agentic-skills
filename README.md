@@ -21,6 +21,17 @@ Substrate / FRAME pallets; the methodology is domain-general.
 - References: pipeline, PoC levels, severity & CVSS, the 22-item fabrication audit, verdict
   decision tree, report templates, known-issue search, and a Substrate/FRAME playbook.
 
+### `feature-demo`
+
+Turns a git branch or PR into a runnable, interactive single-page app that visualizes a new
+feature for a community audience. Two output styles — a **technical** walkthrough (architecture
+graph + live simulator + code references) or a **non-technical** narrated slide deck — both with
+parameter controls that show how each knob affects the system. It reads the diff end-to-end, writes
+a structured `feature-model.md` spec, confirms with the user, then scaffolds the SPA.
+
+- Entry point: [`feature-demo/SKILL.md`](feature-demo/SKILL.md)
+- References: feature analysis, technical mode, non-technical mode, and scaffolding.
+
 ## Using a skill
 
 Point Claude Code at this repo (or copy a skill directory into your skills location) and invoke it
