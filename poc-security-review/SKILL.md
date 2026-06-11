@@ -16,26 +16,39 @@ metadata:
 
 # poc-security-review
 
-A security review that **earns** every finding. Anyone can list "potential issues." This skill
-only reports a bug after it has written a test that makes the bug fail loudly, re-run that test
-to confirm it, and survived an adversarial self-audit designed to kill plausible-but-wrong
-findings. The deliverable is not an opinion — it is a reproducible artifact a maintainer can run.
+A security review that **earns** every finding. It only reports a bug after writing a test that
+makes the bug fail loudly, re-running it to confirm, and surviving an adversarial self-audit that
+kills plausible-but-wrong findings. The deliverable is a reproducible artifact, not an opinion.
 
 ## When to use
 
 - "Audit / security-review this codebase / pallet / contract / module / service."
 - "Find exploitable bugs in X and prove them."
-- Preparing bug-bounty, Code4rena/Sherlock/Immunefi, or private-disclosure submissions.
-- You have a candidate vulnerability and need a defensible PoC + severity writeup.
+- Preparing bug-bounty / Code4rena / Sherlock / Immunefi / private-disclosure submissions, or you
+  have a candidate vulnerability and need a defensible PoC + severity writeup.
 
-When the user just wants a quick correctness/style pass over a diff, use `/code-review` instead.
-This skill is heavier: it produces tests and a full investigation per finding.
+For a quick correctness/style pass over a diff, use `/code-review` instead — this skill is heavier.
+
+## Quick start (one finding, end-to-end)
+
+The whole skill is this loop, repeated per candidate:
+
+1. **Scope** — confirm the file/module is in-scope; note the invariant it promises ("debits at
+   most `amount` once").
+2. **Find** — spot a suspect (e.g. a two-step op where step A commits and step B can fail
+   un-wrapped). Mint `issue-<unix-ms>-<slug>`, drop `// @qa-review: finding — issue-<id>` at the line.
+3. **Prove** — write an **inverted** test (green = bug) at L1; escalate to L2 with real deps.
+   Paste the before→after state delta.
+4. **Assess** — walk the verdict decision tree; assign impact-first severity + CVSS; run the
+   22-item fabrication audit; search for known issues.
+5. **Report** — if it exits as *confirmed*, write `issue-<id>.md` + a concise GitHub issue with
+   the runnable repro. The rest of this file and `references/` expand each step.
 
 ## The pipeline (3 role-phases)
 
-This is designed to run as a **batch of agents over hours**, not a single pass. The three phases
-map to three independent mindsets — keep them separate even when one agent plays all three,
-because the assessor's job is to *distrust* the finder and the PoC-writer.
+Designed to run as a **batch of agents over hours**, not a single pass. The three phases are
+independent mindsets — keep them separate even when one agent plays all three, because the
+assessor's job is to *distrust* the finder and the PoC-writer.
 
 1. **Scope & find** — establish the target and threat model, then sweep for candidate bugs.
    Each candidate gets a stable id `issue-<unix-ms>-<kebab-slug>` and an `@qa-review` annotation
@@ -43,17 +56,14 @@ because the assessor's job is to *distrust* the finder and the PoC-writer.
 2. **Prove (PoC-writer)** — for each candidate, write a graded PoC and escalate as far as the
    evidence allows. L1 proves the bug in isolation; L2 proves it survives the real verification
    chain; L3 proves it on a live system across the process boundary. → `references/poc-levels.md`.
-   For **Substrate / FRAME / Subtensor** targets, the concrete test layers, commands, FRAME bug
-   classes, and live-repro gotchas are in `references/substrate-frame.md` — read it first when the
-   target is a pallet.
+   For **Substrate / FRAME** targets, read `references/substrate-frame.md` first — test layers,
+   commands, FRAME bug classes, and live-repro gotchas.
 3. **Assess (adversarial assessor)** — independently re-run the PoC, then walk the verdict
    decision tree and write the full Investigation: severity + CVSS, likelihood, reachability
    traces, action-state differential, fabrication audit, known-issue search, poc-level
    validation. The assessor may **downgrade or discard** the finding.
    → `references/verdict-decision-tree.md`, `references/severity-and-likelihood.md`,
    `references/fabrication-audit.md`, `references/known-issue-search.md`
-
-Only findings that exit the decision tree as **confirmed** become reports.
 
 ## Hard rules
 
@@ -79,13 +89,12 @@ Per confirmed finding, two artifacts (templates in `references/report-templates.
 
 - **Internal report** `issue-<id>.md` — frontmatter (id, title, status, severity, likelihood,
   cvss, poc-level, file, poc[]) + Description / Preconditions / Code Path / PoC / Investigation.
-- **External issue** — concise GitHub-issue form (Describe the bug / To Reproduce with a runnable
-  test / Expected behavior / Environment @ commit / Additional context + recommended fix).
+- **External issue** — concise GitHub-issue form (Describe the bug / To Reproduce with runnable
+  test / Expected behavior / Environment @ commit / Additional context + fix).
 
 ## How to run it
 
-For a small, targeted review you can run all three phases yourself, sequentially, one finding at
-a time. For a real audit ("be thorough", "find everything"), fan the work out: many finders over
-different subsystems, one PoC-writer per candidate, independent assessors that re-verify. See
-`references/methodology.md` for the orchestration shape (and a Workflow sketch). Multi-agent
-orchestration is opt-in and token-heavy — confirm scale with the user first.
+Small, targeted review: run the three phases yourself, sequentially, one finding at a time. Real
+audit ("be thorough", "find everything"): fan out — many finders over different subsystems, one
+PoC-writer per candidate, independent assessors that re-verify (`references/methodology.md`).
+Multi-agent orchestration is opt-in and token-heavy — confirm scale with the user first.
